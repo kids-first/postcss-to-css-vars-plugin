@@ -17,6 +17,8 @@ const getVarsMapFromOpts = opts => {
   } else {
     varsMap = opts.theme;
   }
+  // overide theme vars with sub theme
+  Object.assign(varsMap, opts.override ? opts.override : {});
   // flaten our nest theme
   varsMap = flatten(_.omit(varsMap, opts.exclude), {
     delimiter: opts.flattenDelimiter ? opts.flattenDelimiter : "-",
