@@ -1,0 +1,37 @@
+{
+  "name": "postcss-to-css-vars",
+  "version": "0.0.0",
+  "description":
+    "PostCSS plugin to convert static css to css with variables based on a js theme file, such as tailwindcss' tailwind.js",
+  "keywords": ["postcss", "css", "postcss-plugin", "css-vars"],
+  "author": "Ben Dolly <bromeodolly@gmail.com>",
+  "license": "MIT",
+  "repository": "bdolly/postcss-to-css-vars",
+  "bugs": {
+    "url": "https://github.com/bdolly/postcss-to-css-vars/issues"
+  },
+  "homepage": "https://github.com/bdolly/postcss-to-css-vars",
+  "dependencies": {
+    "babel-polyfill": "^6.26.0",
+    "flat": "^4.1.0",
+    "lodash": "^4.17.10",
+    "postcss": "^6.0.16"
+  },
+  "devDependencies": {
+    "eslint": "^4.18.2",
+    "eslint-config-postcss": "^2.0.2",
+    "jest": "^22.4.2"
+  },
+  "scripts": {
+    "test": "jest && eslint *.js"
+  },
+  "eslintConfig": {
+    "extends": "eslint-config-postcss/es5",
+    "env": {
+      "jest": true
+    }
+  },
+  "jest": {
+    "testEnvironment": "node"
+  }
+}
