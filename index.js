@@ -19,7 +19,7 @@ const getVarsMapFromOpts = opts => {
   }
   // flaten our nest theme
   varsMap = flatten(_.omit(varsMap, opts.exclude), {
-    delimiter: "-",
+    delimiter: opts.flattenDelimiter ? opts.flattenDelimiter : "-",
     safe: true
   });
   // join array with a ",": this is mostly for font stacks
