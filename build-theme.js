@@ -34,9 +34,10 @@ const normalizeTheme = (hash, theme) => {
     );
     varsHash = _.mapValues(varsHash, (val, key) => {
       let existingVal = _.invert(colorsMap)[val];
-      return existingVal && !key.includes("-colors-")
-        ? `var(${existingVal}, ${val})`
-        : val;
+      let colorKey = [key.split("-")[3], key.split("-")[2]].some(
+        x => x === "colors"
+      );
+      return existingVal && !colorKey ? `var(${existingVal}, ${val})` : val;
     });
   }
   return varsHash;

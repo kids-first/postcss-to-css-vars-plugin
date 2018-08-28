@@ -1,16 +1,13 @@
 /* eslint-disable */
 require("babel-polyfill");
 var postcss = require("postcss");
-var fs = require("fs");
-var path = require("path");
 var _ = require("lodash");
-var flatten = require("flat");
 var getVarsMapFromOpts = require("./build-theme.js");
 
 module.exports = postcss.plugin("postcss-to-css-vars", function(opts) {
   opts = opts || {};
   let varsMap = getVarsMapFromOpts(opts);
-  let logged = false;
+
   let idx = 0;
   return function(root, result) {
     root.walkRules(function(rule) {
@@ -25,7 +22,29 @@ module.exports = postcss.plugin("postcss-to-css-vars", function(opts) {
               .join(",")
           : decl.value;
 
-        const cssVar = _.invert(varsMap)[declVal];
+        let cssVar = _.invert(varsMap)[declVal];
+
+        let selectorParts = selector.split("-").map(x => x.replace(".", ""));
+        //  TODO better css vars lookup
+        // if (selectorParts[0] === "text") {
+        //   let scopedVars = _.fromPairs(
+        //     _.toPairs(varsMap).filter(
+        //       varArr =>
+        //         varArr[0].includes(selectorParts[0]) &&
+        //         varArr[0].includes(selectorParts[1])
+        //     )
+        //   );
+
+        //   let scopedCssVar = _.invert(scopedVars)[declVal];
+
+        //   console.log(`selector: ${selector}`);
+        //   console.log(`decl.prop: ${decl.prop}`);
+        //   console.log(`decl.value: ${decl.value}`);
+        //   console.log(`cssVar: ${cssVar}`);
+        //   console.log(`selectorParts[0]: ${selectorParts[0]}`);
+        //   console.log(scopedVars);
+        //   console.log("\n");
+        // }
 
         decl.value = cssVar ? `var(${cssVar}, ${declVal})` : decl.value;
         idx++;
