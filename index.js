@@ -25,7 +25,10 @@ const getVarsMapFromOpts = opts => {
   // join array with a ",": this is mostly for font stacks
   varsMap = _.mapValues(varsMap, val => (_.isArray(val) ? val.join(",") : val));
   // add css vars syntax to keys
-  varsMap = _.mapKeys(varsMap, (v, k) => `--${k}`);
+  varsMap = _.mapKeys(
+    varsMap,
+    (v, k) => `--${opts.prefix ? opts.prefix + "-" : ""}${k}`
+  );
   return varsMap;
 };
 
