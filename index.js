@@ -4,11 +4,12 @@ var postcss = require("postcss");
 var _ = require("lodash");
 var getVarsMapFromOpts = require("./build-theme.js");
 var matchDecl = require("./match-decl.js");
+var fs = require("fs");
 
 module.exports = postcss.plugin("postcss-to-css-vars", function(opts) {
   opts = opts || {};
   let varsMap = getVarsMapFromOpts(opts);
-
+  console.log("**** mapping css to vars ...");
   let idx = 0;
   return function(root, result) {
     root.walkRules(function(rule) {
@@ -23,7 +24,7 @@ module.exports = postcss.plugin("postcss-to-css-vars", function(opts) {
               .join(",")
           : decl.value;
 
-        let varsContext = matchDecl(selector, decl, varsMap, idx);
+        let varsContext = matchDecl(selector, decl, varsMap, opts.vocab);
         let cssVar = _.invert(varsContext || varsMap)[declVal];
 
         decl.value = cssVar ? `var(${cssVar}, ${declVal})` : decl.value;

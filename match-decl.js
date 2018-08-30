@@ -2,42 +2,27 @@
 var nlp = require("compromise");
 var _ = require("lodash");
 
-// TODO: test below function
-// explore nlp matching with lexicon
-
-// var keyMatch = function(decl, selectorParts, cssVar) {
-//   let declAbv = decl.prop
-//     .split("-")
-//     .map(x => x.charAt(0))
-//     .join("");
-
-//   if (
-//     cssVar.includes(_.camelCase(decl.prop)) ||
-//     cssVar.includes(selectorParts[0])
-//   ) {
-//     return true;
-//   }
-
-//   if (selectorParts[0] === declAbv) {
-//     return true;
-//   } else if (decl.prop.split("-")[0] === selectorParts[0]) {
-//     return true;
-//   } else {
-//     return false;
-//   }
-// };
-
-var matchDecl = function(selector, decl, terms) {
+var matchDecl = function(selector, decl, terms, vocab) {
   let termsList = Object.keys(terms).join("  ");
   let selectorParts = selector
     .split("-")
     .map(x => x.replace(".", "").replace("\n", ""));
   let context = _.camelCase(`${selectorParts[0]}-${decl.prop}`);
+
+  const lexicon = vocab || {};
+
   // match css var name that has either the declaration prop OR
   // the first part of the selector
-  let matched = Object.keys(terms).filter(
-    k => k.includes(_.camelCase(decl.prop)) || k.includes(selectorParts[0])
-  );
+  let matched = Object.keys(terms).filter(k => {
+    if (k.includes(lexicon[selectorParts[0]])) {
+      return true;
+    } else if (
+      k.includes(_.camelCase(decl.prop)) ||
+      k.includes(selectorParts[0])
+    ) {
+      return true;
+    }
+  });
 
   // console.log(`
   //   selector: ${selector}
