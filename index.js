@@ -3,6 +3,7 @@ require("babel-polyfill");
 var postcss = require("postcss");
 var _ = require("lodash");
 var getVarsMapFromOpts = require("./build-theme.js");
+var matchDecl = require("./match-decl.js");
 
 module.exports = postcss.plugin("postcss-to-css-vars", function(opts) {
   opts = opts || {};
@@ -22,29 +23,8 @@ module.exports = postcss.plugin("postcss-to-css-vars", function(opts) {
               .join(",")
           : decl.value;
 
-        let cssVar = _.invert(varsMap)[declVal];
-
-        let selectorParts = selector.split("-").map(x => x.replace(".", ""));
-        //  TODO better css vars lookup
-        // if (selectorParts[0] === "text") {
-        //   let scopedVars = _.fromPairs(
-        //     _.toPairs(varsMap).filter(
-        //       varArr =>
-        //         varArr[0].includes(selectorParts[0]) &&
-        //         varArr[0].includes(selectorParts[1])
-        //     )
-        //   );
-
-        //   let scopedCssVar = _.invert(scopedVars)[declVal];
-
-        //   console.log(`selector: ${selector}`);
-        //   console.log(`decl.prop: ${decl.prop}`);
-        //   console.log(`decl.value: ${decl.value}`);
-        //   console.log(`cssVar: ${cssVar}`);
-        //   console.log(`selectorParts[0]: ${selectorParts[0]}`);
-        //   console.log(scopedVars);
-        //   console.log("\n");
-        // }
+        let varsContext = matchDecl(selector, decl, varsMap, idx);
+        let cssVar = _.invert(varsContext || varsMap)[declVal];
 
         decl.value = cssVar ? `var(${cssVar}, ${declVal})` : decl.value;
         idx++;
@@ -54,7 +34,8 @@ module.exports = postcss.plugin("postcss-to-css-vars", function(opts) {
     // ADD vars to head of css doc
     root.prepend(":root{}");
 
-    let themeVars = _.toPairs(varsMap).forEach(decl => {
+    // add theme vars to sytlesheet
+    _.toPairs(varsMap).forEach(decl => {
       root.first.append({ prop: decl[0], value: decl[1] });
     });
 
