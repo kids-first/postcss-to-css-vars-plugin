@@ -3,32 +3,27 @@ require("babel-polyfill");
 var postcss = require("postcss");
 var _ = require("lodash");
 var getVarsMapFromOpts = require("./build-theme.js");
-var matchDecl = require("./match-decl.js");
+var matchVar = require("./matchVar");
+
 var fs = require("fs");
 
 module.exports = postcss.plugin("postcss-to-css-vars", function(opts) {
   opts = opts || {};
   let varsMap = getVarsMapFromOpts(opts);
-  console.log("**** mapping css to vars ...");
-  let idx = 0;
+
+  console.log("**** created css vars ***");
+
   return function(root, result) {
     root.walkRules(function(rule) {
       let selector = rule.selector;
+
       rule.walkDecls(function(decl) {
-        // We work with each `decl` object here.
-        // normalize arrays
-        const declVal = decl.value.includes(",")
-          ? decl.value
-              .split(",")
-              .map(x => x.trim())
-              .join(",")
+        const varsMatch = matchVar(decl, varsMap);
+
+        decl.value = varsMatch
+          ? `var(${varsMatch[0]}, ${varsMatch[1]})`
           : decl.value;
 
-        let varsContext = matchDecl(selector, decl, varsMap, opts.vocab);
-        let cssVar = _.invert(varsContext || varsMap)[declVal];
-
-        decl.value = cssVar ? `var(${cssVar}, ${declVal})` : decl.value;
-        idx++;
         return decl;
       });
     });
@@ -39,11 +34,15 @@ module.exports = postcss.plugin("postcss-to-css-vars", function(opts) {
     _.toPairs(varsMap).forEach(decl => {
       root.first.append({ prop: decl[0], value: decl[1] });
     });
-
+    let index = 0;
     root.walkRules(":root", function(rule) {
-      rule.parent
-        .insertBefore(0, { text: "vars:start" })
-        .insertAfter(1, { text: "vars:end" });
+      if (index == 0) {
+        rule.parent
+          .insertBefore(0, { text: "vars:start" })
+          .insertAfter(1, { text: "vars:end" });
+        index++;
+      }
     });
   };
+  console.log("**** css vars created ***");
 });

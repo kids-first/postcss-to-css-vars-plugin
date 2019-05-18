@@ -22,9 +22,8 @@ const resolveTheme = opts => {
 const normalizeTheme = (hash, theme) => {
   let varsHash = hash;
   // join array with a ",": this is mostly for font stacks
-  varsHash = _.mapValues(
-    varsHash,
-    val => (_.isArray(val) ? val.join(",") : val)
+  varsHash = _.mapValues(varsHash, val =>
+    _.isArray(val) ? val.join(",") : val
   );
 
   // replace all color values with standard set of color vars
